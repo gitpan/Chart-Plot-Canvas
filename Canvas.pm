@@ -1,10 +1,10 @@
 
 package Chart::Plot::Canvas;
 
-use vars qw($VERSION);
-$VERSION = '0.02';
+our $VERSION = '0.03';
 
 use strict;
+use warnings;
 
 use base qw(Chart::Plot);
 
@@ -47,7 +47,8 @@ sub draw {
     $_ = $_[0];                       # forgot these in ver 0.10
     return $self->{'_im'}->$_();      # an embarrassment
 
-  } else {
+  }
+  else {
     $_ = $_image_types[0];
     return $self->{'_im'}->$_();
   }
@@ -102,13 +103,13 @@ sub _init {
   $self->{'_ymin'} = 0;    $self->{'_ymax'} = 0;
   $self->{'_xslope'} = 0;  $self->{'_yslope'} = 0; # for _data2pxl()
   $self->{'_ax'} = 0;      $self->{'_ay'} = 0;
-  $self->{"_omx"} = 0;     $self->{"_omy"} = 0; # for axis ticks
+  $self->{'_omx'} = 0;     $self->{'_omy'} = 0; # for axis ticks
   $self->{'_validMinMax'} = 0; # last calculated min and max still valid
 
   # initialize text
-  ($self->{'_horAxisLabel'}, $self->{'_vertAxisLabel'}) = ('','');
-  $self->{'_title'} = '';
-  $self->{'_errorMessage'} = '';
+  ($self->{'_horAxisLabel'}, $self->{'_vertAxisLabel'}) = (q{},q{});
+  $self->{'_title'} = q{};
+  $self->{'_errorMessage'} = q{};
 
   # initialize custom tick labels
   ($self->{'_xTickLabels'}, $self->{'_yTickLabels'}) = (0,0);
@@ -145,8 +146,8 @@ sub _init_gd {
 
   # Put a black frame around the picture
   $self->{'_im'}->rectangle( 0, 0,
-			     $self->{'_imx'}-1, $self->{'_imy'}-1,
-			     $self->{'_black'});
+                             $self->{'_imx'}-1, $self->{'_imy'}-1,
+                             $self->{'_black'});
 }
 
 sub _init_cv {
@@ -167,15 +168,15 @@ sub _init_cv {
   );
 
   # some fonts
-  if ($^O eq "MSWin32") {
-    $self->{'_MediumBoldFont'} = "{MS Sans serif} 8 bold",
-    $self->{'_SmallFont'} = "Tahoma 8",
-    $self->{'_TinyFont'} = "{Small Fonts} 6",
-  } else {
-    warn "Font TODO\n";
-    $self->{'_MediumBoldFont'} = "",    # 7x13 Bold
-    $self->{'_SmallFont'} = "",         # 6x12
-    $self->{'_TinyFont'} = "",          # 5x8
+  if ($^O eq 'MSWin32') {
+    $self->{'_MediumBoldFont'} = "{MS Sans serif} 8 bold";
+    $self->{'_SmallFont'} = "Tahoma 8";
+    $self->{'_TinyFont'} = "{Small Fonts} 6";
+  }
+  else {
+    $self->{'_MediumBoldFont'} = '7x13bold';
+    $self->{'_SmallFont'} = '6x12';
+    $self->{'_TinyFont'} =  '5x8';
   }
 }
 
@@ -191,15 +192,16 @@ sub _createData {
     if ( $self->{'_dataStyle'}->{$dataSetLabel} =~ /((red)|(blue)|(green))/i ) {
       $color = $1;
       $color =~ tr/A-Z/a-z/;
-    } else {
+    }
+    else {
       $color = 'black';
     }
 
     # draw the first point
     ($px, $py) = $self->_data2pxl (
-				   $self->{'_data'}->{$dataSetLabel} [0],
-				   $self->{'_data'}->{$dataSetLabel} [1]
-				  );
+                                   $self->{'_data'}->{$dataSetLabel} [0],
+                                   $self->{'_data'}->{$dataSetLabel} [1]
+                                  );
     $self->{'_cv'}->createOval($px-2, $py-2, $px+2, $py+2, -fill => $color, -outline => $color)
       unless $self->{'_dataStyle'}->{$dataSetLabel} =~ /nopoint/i;
 
@@ -216,29 +218,31 @@ sub _createData {
 
       # get next point
       ($px, $py) = $self->_data2pxl (
-				     $self->{'_data'}->{$dataSetLabel}[$i],
-				     $self->{'_data'}->{$dataSetLabel}[$i+1]
-				    );
+                                     $self->{'_data'}->{$dataSetLabel}[$i],
+                                     $self->{'_data'}->{$dataSetLabel}[$i+1]
+                                    );
 
       # draw point, maybe
       $self->{'_cv'}->createOval($px-2, $py-2, $px+2, $py+2, -fill => $color, -outline => $color)
-	unless $self->{'_dataStyle'}->{$dataSetLabel} =~ /nopoint/i;
+        unless $self->{'_dataStyle'}->{$dataSetLabel} =~ /nopoint/i;
 
       # draw line from previous point, maybe
       if ($self->{'_dataStyle'}->{$dataSetLabel} =~ /dashed/) {
-#	$self->{'_cv'}->createLine($prevpx, $prevpy, $px, $py, -width => 1, -dash => [6,6], -fill => $color);
-	$self->{'_cv'}->createLine($prevpx, $prevpy, $px, $py, -dash => ',', -fill => $color);
-      } elsif ($self->{'_dataStyle'}->{$dataSetLabel} =~ /noline/i) {
-	next;
-      } else { # default to solid line
-	$self->{'_cv'}->createLine($prevpx, $prevpy, $px, $py, -fill => $color);
+#        $self->{'_cv'}->createLine($prevpx, $prevpy, $px, $py, -width => 1, -dash => [6,6], -fill => $color);
+        $self->{'_cv'}->createLine($prevpx, $prevpy, $px, $py, -dash => ',', -fill => $color);
+      }
+      elsif ($self->{'_dataStyle'}->{$dataSetLabel} =~ /noline/i) {
+        next;
+      }
+      else { # default to solid line
+        $self->{'_cv'}->createLine($prevpx, $prevpy, $px, $py, -fill => $color);
       }
 
       ($prevpx, $prevpy) = ($px, $py);
 
       # debugging
       if ($self->{'_debugging'}) {
-	print STDERR "$i ($px, $py)";
+        print STDERR "$i ($px, $py)";
       }
     }
   }
@@ -264,10 +268,10 @@ sub _createAxes {
   my $xStart = ($p2x+$len/2 > $self->{'_imx'}-10) # center under right end of axis
     ? ($self->{'_imx'}-10-$len) : ($p2x-$len/2);  #   or right justify
   $self->{'_cv'}->createText($xStart, $p2y+3*$h/2,
-			     -font => $self->{'_SmallFont'},
-			     -anchor => 'nw',
-			     -text => $self->{'_horAxisLabel'},
-			     -fill => 'black');
+                             -font => $self->{'_SmallFont'},
+                             -anchor => 'nw',
+                             -text => $self->{'_horAxisLabel'},
+                             -fill => 'black');
 
   print STDERR "\nHor: p1 ($p1x, $p1y) p2 ($p2x, $p2y)\n"
     if $self->{'_debugging'};
@@ -280,10 +284,10 @@ sub _createAxes {
   ### axis label
   $xStart = $p2x - length ($self->{'_vertAxisLabel'}) * $w / 2;
   $self->{'_cv'}->createText(($xStart>10 ? $xStart : 10), $p2y - 2*$h,
-			     -font => $self->{'_SmallFont'},
-			     -anchor => 'nw',
-			     -text => $self->{'_vertAxisLabel'},
-			     -fill => 'black');
+                             -font => $self->{'_SmallFont'},
+                             -anchor => 'nw',
+                             -text => $self->{'_vertAxisLabel'},
+                             -fill => 'black');
 
   print STDERR "Ver: p1 ($p1x, $p1y) p2 ($p2x, $p2y)\n"
     if $self->{'_debugging'};
@@ -307,13 +311,14 @@ sub _createAxes {
       ($px,$py) = $self->_data2pxl($_, 0);
       $self->{'_cv'}->createLine($px, $py-2, $px, $py+2, -fill => 'black');
       $self->{'_cv'}->createText($px, $py+3,
-				 -font => $self->{'_SmallFont'},
-				 -anchor => 'n',
-				 -text => ${$self->{'_xTickLabels'}}{$_},
-				 -fill => 'black');
+                                 -font => $self->{'_SmallFont'},
+                                 -anchor => 'n',
+                                 -text => ${$self->{'_xTickLabels'}}{$_},
+                                 -fill => 'black');
     }
 
-  } else {
+  }
+  else {
 
     # horizontal step calculation
     $step = $self->{'_omx'};
@@ -328,10 +333,10 @@ sub _createAxes {
       ($px,$py) = $self->_data2pxl($i, 0);
       $self->{'_cv'}->createLine($px, $py-2, $px, $py+2, -fill => 'black');
       $self->{'_cv'}->createText($px, $py+3,
-				 -font => $self->{'_SmallFont'},
-				 -anchor => 'n',
-				 -text => $i,
-				 -fill => 'black') unless $i == 0;
+                                 -font => $self->{'_SmallFont'},
+                                 -anchor => 'n',
+                                 -text => $i,
+                                 -fill => 'black') unless $i == 0;
     }
     print STDERR "Horstep: $step ($self->{'_xmax'} - $self->{'_xmin'})/$self->{'_omx'})\n"
       if $self->{'_debugging'};
@@ -345,12 +350,13 @@ sub _createAxes {
       ($px,$py) = $self->_data2pxl(0, $_);
       $self->{'_cv'}->createLine($px-2, $py, $px+2, $py, -fill => 'black');
       $self->{'_cv'}->createText($px-5, $py,
-				 -font => $self->{'_SmallFont'},
-				 -anchor => 'e',
-				 -text => ${$self->{'_yTickLabels'}}{$_},
-				 -fill => 'black');
+                                 -font => $self->{'_SmallFont'},
+                                 -anchor => 'e',
+                                 -text => ${$self->{'_yTickLabels'}}{$_},
+                                 -fill => 'black');
     }
-  } else {
+  }
+  else {
     $step = $self->{'_omy'};
     $step /= 2  if ($self->{'_ymax'} - $self->{'_ymin'}) / $step < 6;
     $step /= 2  if ($self->{'_ymax'} - $self->{'_ymin'}) / $step < 6;
@@ -360,10 +366,10 @@ sub _createAxes {
       ($px,$py) = $self->_data2pxl (0, $i);
       $self->{'_cv'}->createLine($px-2, $py, $px+2, $py, -fill => 'black');
       $self->{'_cv'}->createText($px-5, $py,
-				 -font => $self->{'_SmallFont'},
-				 -anchor => 'e',
-				 -text => $i,
-				 -fill => 'black') unless $i == 0;
+                                 -font => $self->{'_SmallFont'},
+                                 -anchor => 'e',
+                                 -text => $i,
+                                 -fill => 'black') unless $i == 0;
     }
     print STDERR "Verstep: $step ($self->{'_ymax'} - $self->{'_ymin'})/$self->{'_omy'})\n"
       if $self->{'_debugging'};
@@ -388,13 +394,13 @@ sub _createTitle {
 
   # centered below chart
   my ($px,$py) = ($self->{'_imx'}/2, # $self->{'_vertGraphOffset'}/2);
-		  $self->{'_imy'} - $self->{'_vertGraphOffset'}/2);
+                  $self->{'_imy'} - $self->{'_vertGraphOffset'}/2);
 
    $self->{'_cv'}->createText($px, $py,
-			      -font => $self->{'_MediumBoldFont'},
-			      -anchor => 'center',
-			      -text => $self->{'_title'},
-			      -fill => 'black');
+                              -font => $self->{'_MediumBoldFont'},
+                              -anchor => 'center',
+                              -text => $self->{'_title'},
+                              -fill => 'black');
 }
 
 1;
@@ -422,10 +428,10 @@ Chart::Plot::Canvas - Plot two dimensional data in an Tk Canvas.
     my ($xmin, $ymin, $xmax, $ymax) = $img->getBounds();
 
     $img->setGraphOptions ('horGraphOffset' => 75,
-    			    'vertGraphOffset' => 100,
-    			    'title' => 'My Graph Title',
-    			    'horAxisLabel' => 'my X label',
-    			    'vertAxisLabel' => 'my Y label' );
+                           'vertGraphOffset' => 100,
+                           'title' => 'My Graph Title',
+                           'horAxisLabel' => 'my X label',
+                           'vertAxisLabel' => 'my Y label' );
 
     print $img->draw();
 
@@ -464,7 +470,7 @@ L<Chart::Plot>
 
 =head1 COPYRIGHT
 
-(c) 2003 Francois PERRAD, France. All rights reserved.
+(c) 2003-2007 Francois PERRAD, France. All rights reserved.
 
 This library is distributed under the terms of the Artistic Licence.
 
