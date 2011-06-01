@@ -1,7 +1,7 @@
 
 package Chart::Plot::Canvas;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use strict;
 use warnings;
@@ -470,9 +470,9 @@ L<Chart::Plot>
 
 =head1 COPYRIGHT
 
-(c) 2003-2007 Francois PERRAD, France. All rights reserved.
+(c) 2003-2011 Francois PERRAD, France. All rights reserved.
 
-This library is distributed under the terms of the Artistic Licence.
+This library is distributed under the terms of the Artistic Licence 2.0.
 
 =head1 AUTHOR
 

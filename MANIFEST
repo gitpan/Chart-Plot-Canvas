@@ -1,7 +1,11 @@
-Canvas.pm
 Changes
+LICENSE
 Makefile.PL
 MANIFEST
 README
-test.pl
+t/Chart-Plot-Canvas.t
+t/Chart-Plot-Canvas-Tagged.t
+t/pod.t
+lib/Chart/Plot/Canvas.pm
+lib/Chart/Plot/Canvas/Tagged.pm
 META.yml                                 Module meta-data (added by MakeMaker)

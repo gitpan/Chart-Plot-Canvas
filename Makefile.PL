@@ -3,14 +3,12 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     'NAME'          => 'Chart::Plot::Canvas',
-    'VERSION_FROM'  => 'Canvas.pm',
+    'VERSION_FROM'  => 'lib/Chart/Plot/Canvas.pm',
     'ABSTRACT'      => 'Plot two dimensional data in an Tk Canvas',
     'PREREQ_PM'     => {
-                        'Tk'            => 0,
-                        'Chart::Plot'   => 0.11,
-    },
-    'PM'            => {
-                        'Canvas.pm'     => '$(INST_LIBDIR)/Canvas.pm',
+                        'Tk'                    => 0,
+                        'Chart::Plot'           => 0.11,
+                        'Chart::Plot::Tagged'   => 0.02,
     },
     'AUTHOR'        => "Francois PERRAD (francois.perrad\@gadz.org)",
     'dist'          => {

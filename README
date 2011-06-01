@@ -9,8 +9,6 @@ Chart/Plot/Canvas
 
     The graphs are descripted by same way as for Chart::Plot.
 
-    WARNING: Tested only on Win32.
-
 INSTALLATION
 
 To install this module type the following:
@@ -26,15 +24,11 @@ This module requires these other modules and libraries:
 
   Tk, Chart::Plot (0.11)
 
-TODO
-
-    Ports on *nix
-
 COPYRIGHT AND LICENCE
 
-  (c) 2003-2007 Francois PERRAD, France. All rights reserved.
-
-  This library is distributed under the terms of the Artistic Licence.
+  (c) 2003-2011 Francois PERRAD, France. All rights reserved.
+.
+  This library is distributed under the terms of the Artistic Licence 2.0.
 
 
 Send bug reports, comments and suggestions to francois.perrad@gadz.org
